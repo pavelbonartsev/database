@@ -34,13 +34,12 @@ class Task(Base):
         Integer,
         default=1  # 1-низкий, 2-средний, 3-высокий
     )
-    
-    # Внешний ключ на пользователя
+
     telegram_id = Column(
         Integer,
         ForeignKey('telegram_users.telegram_id', ondelete='CASCADE'),
         nullable=False
     )
-    
-    # Обратная связь с пользователем
+
     user = relationship("TelegramUser", back_populates="tasks")
+
