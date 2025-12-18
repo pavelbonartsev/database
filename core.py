@@ -4,7 +4,6 @@ from database.base_model import Base
 from database.tg_users import TelegramUser
 from database.tasks import Task
 
-# Создаем SQLite базу данных
 engine = create_engine('sqlite:///todo_bot.db')
 SessionLocal = sessionmaker(bind=engine)
 
@@ -21,3 +20,4 @@ def get_db():
         yield db
     finally:
         db.close()
+
