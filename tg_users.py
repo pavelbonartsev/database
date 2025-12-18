@@ -31,5 +31,5 @@ class TelegramUser(Base):
         onupdate=func.now()
     )
     
-    # Связь с задачами (одному пользователю - много задач)
     tasks = relationship("Task", back_populates="user", cascade="all, delete-orphan")
+
