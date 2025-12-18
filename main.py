@@ -8,7 +8,6 @@ from database.crud import (
 import os
 from dotenv import load_dotenv
 
-# Загружаем переменные окружения
 load_dotenv()
 API_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
@@ -17,10 +16,8 @@ if not API_TOKEN:
 
 bot = telebot.TeleBot(API_TOKEN)
 
-# Инициализация базы данных
 init_db()
 
-# Команда /start
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     with next(get_db()) as db:
@@ -45,7 +42,6 @@ def send_welcome(message):
     
     bot.send_message(message.chat.id, welcome_text)
 
-# Команда /help
 @bot.message_handler(commands=['help'])
 def send_help(message):
     help_text = (
@@ -64,7 +60,6 @@ def send_help(message):
     )
     bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
 
-# Создание новой задачи
 @bot.message_handler(commands=['newtask'])
 def new_task_command(message):
     msg = bot.send_message(message.chat.id, "Введите название задачи:")
@@ -106,7 +101,6 @@ def process_task_priority(message, title, description):
         reply_markup=types.ReplyKeyboardRemove()
     )
 
-# Показать задачи пользователя
 @bot.message_handler(commands=['mytasks'])
 def show_all_tasks(message):
     with next(get_db()) as db:
@@ -125,7 +119,6 @@ def show_all_tasks(message):
     response += "\nИспользуйте /mypending или /mycompleted для фильтрации."
     bot.send_message(message.chat.id, response, parse_mode='Markdown')
 
-# Показать незавершенные задачи
 @bot.message_handler(commands=['mypending'])
 def show_pending_tasks(message):
     with next(get_db()) as db:
@@ -145,8 +138,6 @@ def show_pending_tasks(message):
     
     response += "\nЧтобы отметить задачу выполненной, отправьте: `/done номер_задачи`"
     bot.send_message(message.chat.id, response, parse_mode='Markdown')
-
-# Показать завершенные задачи
 @bot.message_handler(commands=['mycompleted'])
 def show_completed_tasks(message):
     with next(get_db()) as db:
@@ -157,7 +148,7 @@ def show_completed_tasks(message):
         return
     
     response = "✅ **Завершенные задачи:**\n\n"
-    for task in tasks[:10]:  # Показываем только последние 10
+    for task in tasks[:10]:  
         response += f"#{task.task_id}: {task.title}\n"
         if task.completed_at:
             response += f"   🕐 Завершено: {task.completed_at.strftime('%d.%m.%Y %H:%M')}\n"
@@ -167,8 +158,6 @@ def show_completed_tasks(message):
         response += f"\n... и еще {len(tasks) - 10} задач"
     
     bot.send_message(message.chat.id, response, parse_mode='Markdown')
-
-# Статистика
 @bot.message_handler(commands=['stats'])
 def show_stats(message):
     with next(get_db()) as db:
@@ -188,12 +177,10 @@ def show_stats(message):
     
     bot.send_message(message.chat.id, response, parse_mode='Markdown')
 
-# Обработка текстовых команд
 @bot.message_handler(func=lambda message: True)
 def handle_text(message):
     text = message.text.strip().lower()
-    
-    # Обработка команды /done номер
+
     if text.startswith('/done'):
         try:
             task_id = int(text.split()[1])
@@ -207,7 +194,7 @@ def handle_text(message):
         except (IndexError, ValueError):
             bot.send_message(message.chat.id, "Используйте: `/done номер_задачи`", parse_mode='Markdown')
     
-    # Обработка команды /delete номер
+
     elif text.startswith('/delete'):
         try:
             task_id = int(text.split()[1])
@@ -225,7 +212,7 @@ def handle_text(message):
         bot.send_message(message.chat.id, 
                         "Неизвестная команда. Используйте /help для списка команд.")
 
-# Запуск бота
 if __name__ == '__main__':
     print("Бот запущен...")
     bot.infinity_polling()
+
